@@ -1,0 +1,48 @@
+# version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+    networks:
+      - chatapp-network
+    # command: sh -c "python init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+    # frontend:
+    #   build:
+    #     context: ./frontend
+    #     dockerfile: Dockerfile
+    #     depends_on:
+    #       - backend
+    #     volumes:
+    #       - ./frontend:/app
+    #       - /app/node_modules
+    #     command: npm start
+
+  db:
+    image: postgres:latest
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - chatapp-network
+
+volumes:
+  postgres_data:
+
+
+networks:
+  chatapp-network:
+    driver: bridge
